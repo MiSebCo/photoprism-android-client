@@ -3,6 +3,7 @@ package ua.com.radiokot.photoprism.util.downloader
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableEmitter
 import okhttp3.Request
+import okio.Buffer
 import okio.Sink
 import ua.com.radiokot.photoprism.di.HttpClient
 import ua.com.radiokot.photoprism.extension.checkNotNull
@@ -51,6 +52,10 @@ class OkHttpObservableDownloader(
         url: String,
         destination: Sink
     ): Observable<ObservableDownloader.Progress> {
+        destination.use {
+            it.write(Buffer().apply { write(byteArrayOf(0)) }, 1)
+        }
+        return Observable.empty()
         val emitterKey = requestCounter.incrementAndGet()
 
         val call = observableHttpClient.newCall(
